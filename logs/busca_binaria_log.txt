@@ -1,0 +1,15 @@
+2024-08-10 16:37:53 - Busca Binária - Tempo de Execução: 0.003014 segundos
+2024-08-10 16:37:53 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:37:53 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:43:52 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:43:52 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:43:52 - Busca Binária - Tempo de Execução: 0.001095 segundos
+2024-08-10 16:51:44 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:51:44 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:51:44 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:51:51 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:51:51 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:51:51 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:52:38 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:52:38 - Busca Binária - Tempo de Execução: 0.000000 segundos
+2024-08-10 16:52:38 - Busca Binária - Tempo de Execução: 0.000000 segundos
