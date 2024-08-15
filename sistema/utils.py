@@ -28,6 +28,9 @@ def salvar_dados(imoveis, clientes, corretores):
         pickle.dump(clientes, f)
     with open('corretores.db', 'wb') as f:
         pickle.dump(corretores, f)
+    
+
+
 
 # Funções de log
 def log_time_sequencial(exec_time):

@@ -1,8 +1,8 @@
-import time
-from sistema.utils import log_time_ordenacao
+# import time
+# from sistema.utils import log_time_ordenacao
 
 def merge_sort(lista, chave):
-    start_time = time.time()
+    # start_time = time.time()
     if len(lista) > 1:
         meio = len(lista) // 2
         esquerda = lista[:meio]
@@ -33,4 +33,4 @@ def merge_sort(lista, chave):
             lista[k] = direita[j]
             j += 1
             k += 1
-    log_time_ordenacao(time.time() - start_time)
+    # log_time_ordenacao(time.time() - start_time)
