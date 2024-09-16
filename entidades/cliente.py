@@ -8,3 +8,9 @@ class Cliente:
 
     def __str__(self):
         return f"Cliente(ID: {self.id}, Nome: {self.nome}, Telefone: {self.telefone}, Email: {self.email})"
+    
+    def __lt__(self, other):
+        return self.id < other.id
+    
+    def __eq__(self, other):
+        return self.id == other.id

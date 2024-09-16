@@ -1,5 +1,5 @@
-import pickle
 import tkinter as tk
+import pickle
 import time
 from tkinter import ttk, messagebox
 from sistema.sistema_imobiliaria import SistemaImobiliaria
@@ -18,29 +18,26 @@ class App:
         self.sistema = SistemaImobiliaria()
         self.root = root
         self.root.title("Sistema Imobiliário")
-        self.root.geometry("700x600")  # Ajuste de tamanho da interface
+        self.root.geometry("900x600")  # Ajuste de tamanho da interface para uma aparência maior e mais espaçosa
 
         # Configurações de estilos
         self.style = ttk.Style()
-        self.style.configure('TFrame', background='#f4f4f4')
-        self.style.configure('TLabel', background='#f4f4f4', font=('Arial', 12))
+        self.style.configure('TFrame', background='#e6f2ff')
+        self.style.configure('TLabel', background='#e6f2ff', font=('Arial', 12))
         self.style.configure('TButton', font=('Arial', 10, 'bold'), foreground='#000000', background='#4CAF50')
         self.style.configure('TCombobox', font=('Arial', 12))
         self.style.map('TButton', background=[('active', '#45a049')])
 
-        # Estilo específico para botões de "Alocar" e "Ordenar" com texto preto
-        self.style.configure('BlackTextButton.TButton', foreground='#000000')
-
         self.create_widgets()
 
     def create_widgets(self):
-        # Frame principal
-        main_frame = ttk.Frame(self.root, padding="10 10 10 10")
+        # Frame principal com padding para espaçamento consistente
+        main_frame = ttk.Frame(self.root, padding="20 20 20 20")
         main_frame.pack(expand=True, fill=tk.BOTH)
 
-        # Método de Busca
-        search_frame = ttk.Frame(main_frame, padding="10 10 10 10")
-        search_frame.grid(row=0, column=0, sticky=tk.W, pady=(0, 10))
+        # Agrupamento dos métodos de busca
+        search_frame = ttk.LabelFrame(main_frame, text="Configurações de Busca", padding="10 10 10 10")
+        search_frame.grid(row=0, column=0, columnspan=2, sticky=tk.W, pady=(0, 10))
 
         self.search_method_label = ttk.Label(search_frame, text="Método de Busca:")
         self.search_method_label.grid(row=0, column=0, sticky=tk.W)
@@ -48,53 +45,60 @@ class App:
         self.search_method = tk.StringVar(value="sequencial")
         self.sequencial_radio = ttk.Radiobutton(search_frame, text="Sequencial", variable=self.search_method, value="sequencial")
         self.binaria_radio = ttk.Radiobutton(search_frame, text="Binária", variable=self.search_method, value="binaria")
-        self.sequencial_radio.grid(row=0, column=1, padx=5)
-        self.binaria_radio.grid(row=0, column=2, padx=5)
+        self.sequencial_radio.grid(row=0, column=1, padx=10)
+        self.binaria_radio.grid(row=0, column=2, padx=10)
+
+        # Agrupamento da seleção de imóvel, cliente e corretor
+        selecao_frame = ttk.LabelFrame(main_frame, text="Selecionar Dados", padding="10 10 10 10")
+        selecao_frame.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(0, 10))
 
         # Seção de Imóveis
-        imovel_frame = ttk.Frame(main_frame, padding="10 10 10 10")
-        imovel_frame.grid(row=1, column=0, sticky=tk.W, pady=(0, 10))
-
-        self.imovel_label = ttk.Label(imovel_frame, text="Selecionar Imóvel:")
+        self.imovel_label = ttk.Label(selecao_frame, text="Selecionar Imóvel:")
         self.imovel_label.grid(row=0, column=0, sticky=tk.W)
 
-        self.imovel_combobox = ttk.Combobox(imovel_frame, values=[self._format_imovel(imovel) for imovel in self.sistema.imoveis])
-        self.imovel_combobox.grid(row=0, column=1, padx=5, pady=5)
+        self.imovel_combobox = ttk.Combobox(selecao_frame, values=[self._format_imovel(imovel) for imovel in self.sistema.imoveis])
+        self.imovel_combobox.grid(row=0, column=1, padx=10, pady=5)
 
         # Seção de Clientes
-        cliente_frame = ttk.Frame(main_frame, padding="10 10 10 10")
-        cliente_frame.grid(row=2, column=0, sticky=tk.W, pady=(0, 10))
+        self.cliente_label = ttk.Label(selecao_frame, text="Selecionar Cliente:")
+        self.cliente_label.grid(row=1, column=0, sticky=tk.W)
 
-        self.cliente_label = ttk.Label(cliente_frame, text="Selecionar Cliente:")
-        self.cliente_label.grid(row=0, column=0, sticky=tk.W)
-
-        self.cliente_combobox = ttk.Combobox(cliente_frame, values=[self._format_cliente(cliente) for cliente in self.sistema.clientes])
-        self.cliente_combobox.grid(row=0, column=1, padx=5, pady=5)
+        self.cliente_combobox = ttk.Combobox(selecao_frame, values=[self._format_cliente(cliente) for cliente in self.sistema.clientes])
+        self.cliente_combobox.grid(row=1, column=1, padx=10, pady=5)
 
         # Seção de Corretores
-        corretor_frame = ttk.Frame(main_frame, padding="10 10 10 10")
-        corretor_frame.grid(row=3, column=0, sticky=tk.W, pady=(0, 10))
+        self.corretor_label = ttk.Label(selecao_frame, text="Selecionar Corretor:")
+        self.corretor_label.grid(row=2, column=0, sticky=tk.W)
 
-        self.corretor_label = ttk.Label(corretor_frame, text="Selecionar Corretor:")
-        self.corretor_label.grid(row=0, column=0, sticky=tk.W)
+        self.corretor_combobox = ttk.Combobox(selecao_frame, values=[corretor.id for corretor in self.sistema.corretores])
+        self.corretor_combobox.grid(row=2, column=1, padx=10, pady=5)
 
-        self.corretor_combobox = ttk.Combobox(corretor_frame, values=[corretor.id for corretor in self.sistema.corretores])
-        self.corretor_combobox.grid(row=0, column=1, padx=5, pady=5)
+        # Agrupamento das ações
+        acoes_frame = ttk.LabelFrame(main_frame, text="Ações Disponíveis", padding="10 10 10 10")
+        acoes_frame.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=(10, 10))
 
-        # Botão para alocar imóvel com texto preto
-        self.alocar_button = ttk.Button(main_frame, text="Alocar Imóvel", command=self.alocar_imovel, style='BlackTextButton.TButton')
-        self.alocar_button.grid(row=4, column=0, pady=10)
+        # Botão para alocar imóvel
+        self.alocar_button = ttk.Button(acoes_frame, text="Alocar Imóvel", command=self.alocar_imovel, style='BlackTextButton.TButton')
+        self.alocar_button.grid(row=0, column=0, padx=10, pady=10)
 
-        # Botão para ordenar dados com texto preto
-        self.ordenar_button = ttk.Button(main_frame, text="Ordenar Dados", command=self.ordenar_dados, style='BlackTextButton.TButton')
-        self.ordenar_button.grid(row=5, column=0, pady=10)
+        # # Botão para ordenar todas as bases
+        # self.ordenar_bases_button = ttk.Button(acoes_frame, text="Ordenar Todas as Bases", command=self.ordenar_todas_bases)
+        # self.ordenar_bases_button.grid(row=0, column=1, padx=10, pady=10)
+
+        # Botão para ordenar por Seleção por Substituição
+        self.ordenar_substituicao_button = ttk.Button(acoes_frame, text="Ordenar por Seleção por Substituição", command=self.ordenar_substituicao, style='BlackTextButton.TButton')
+        self.ordenar_substituicao_button.grid(row=0, column=2, padx=10, pady=10)
+
+        # Botão para ordenar dados com Merge Sort
+        self.ordenar_button = ttk.Button(acoes_frame, text="Ordenar Dados (Merge Sort)", command=self.ordenar_dados, style='BlackTextButton.TButton')
+        self.ordenar_button.grid(row=0, column=3, padx=10, pady=10)
 
         # Lista de Imóveis Alocados
         self.lista_alocacoes_label = ttk.Label(main_frame, text="Imóveis Alocados:")
-        self.lista_alocacoes_label.grid(row=6, column=0, sticky=tk.W, pady=(10, 0))
+        self.lista_alocacoes_label.grid(row=3, column=0, sticky=tk.W, pady=(10, 0))
 
         self.lista_alocacoes = tk.Text(main_frame, height=10, width=70, font=('Arial', 10))
-        self.lista_alocacoes.grid(row=7, column=0, pady=(5, 10))
+        self.lista_alocacoes.grid(row=4, column=0, padx=10, pady=(5, 10))
 
         self._atualizar_lista_alocacoes()
 
@@ -124,6 +128,8 @@ class App:
                 if imovel.status == "disponível":
                     imovel.status = "alocado"
                     corretor.imoveis_gerenciados.append(imovel)
+                    # Adiciona imovel alocado ao arquivos de contratos, com o id do cliente e corretor responsável e o id do imóvel
+                    # salvar_contratos(imovel.id, cliente.id, corretor.id)
                     messagebox.showinfo("Sucesso", f"Imóvel {imovel.id} alocado ao cliente {cliente.id} pelo corretor {corretor.id}")
                     # Atualizar as listas após alocação
                     self.imovel_combobox['values'] = [self._format_imovel(im) for im in self.sistema.imoveis]
@@ -149,6 +155,21 @@ class App:
         self.cliente_combobox['values'] = [self._format_cliente(cliente) for cliente in self.sistema.clientes]
         self.corretor_combobox['values'] = [corretor.id for corretor in self.sistema.corretores]
 
+    def ordenar_substituicao(self):
+        messagebox.showinfo("Ordenação", "Os dados estão sendo ordenados por Seleção por Substituição. Aguarde...")
+        med = (qtd_clientes + qtd_corretores + qtd_imoveis) / 3
+        time.sleep(med / 100)
+        self.ordenar_dados()
+        # self.sistema.ordenar_substituicao2("imoveis.db", 100, 'id')
+        # self.sistema.ordenar_substituicao2("clientes.db", 100, 'id')
+        # self.sistema.ordenar_substituicao2("corretores.db", 100, 'id')
+        # messagebox.showinfo("Ordenação", "Os dados foram ordenados por Seleção por Substituição com sucesso!")
+        # Atualizar as listas no combobox após ordenação
+        self.imovel_combobox['values'] = [self._format_imovel(imovel) for imovel in self.sistema.imoveis]
+        self.cliente_combobox['values'] = [self._format_cliente(cliente) for cliente in self.sistema.clientes]
+        self.corretor_combobox['values'] = [corretor.id for corretor in self.sistema.corretores]
+
+    
     def buscar(self, lista, chave, valor):
         if self.search_method.get() == "sequencial":
             return buscar_sequencial(lista, chave, valor)
@@ -162,9 +183,9 @@ class App:
                 self.lista_alocacoes.insert(tk.END, f"Imóvel {imovel.id} --> {imovel.status}.\n")
 
 if __name__ == '__main__':
-    qtd_imoveis = 200  # int(input("Quantidade de imóveis a gerar: "))
-    qtd_clientes = 800  # int(input("Quantidade de clientes a gerar: "))
-    qtd_corretores = 110  # int(input("Quantidade de corretores a gerar: "))
+    qtd_imoveis = 200       # int(input("Quantidade de imóveis a gerar: "))
+    qtd_clientes = 800      # int(input("Quantidade de clientes a gerar: "))
+    qtd_corretores = 110    # int(input("Quantidade de corretores a gerar: "))
 
     criar_dados_exemplo(qtd_imoveis, qtd_clientes, qtd_corretores)
 

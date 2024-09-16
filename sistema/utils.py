@@ -28,6 +28,10 @@ def salvar_dados(imoveis, clientes, corretores):
         pickle.dump(clientes, f)
     with open('corretores.db', 'wb') as f:
         pickle.dump(corretores, f)
+
+# def salvar_contratos(imovel, cliente, corretor):
+#     with open('contratos.db', 'wb') as f:
+#         f.write(f"{imovel.codigo} - {cliente.codigo} - {corretor.codigo}\n")
     
 
 
