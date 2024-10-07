@@ -1,4 +1,3 @@
-import re
 import pickle
 class WinnerTree:
     def __init__(self, competidores):
@@ -10,16 +9,6 @@ class WinnerTree:
         self.tree = [None] * (2 * self.n)
         self.competidores = competidores
         self._construir_arvore()
-
-    def extrair_letra_numero(self, s):
-        """
-        Extrai a primeira letra e o primeiro número de uma string.
-        :param s: String de entrada.
-        :return: Tupla contendo a letra e o número.
-        """
-        letra = re.search(r'[A-Za-z]', s)
-        numero = re.search(r'\d+', s)
-        return (letra.group(0) if letra else None, int(numero.group(0)) if numero else None)
 
     def _construir_arvore(self):
         """
@@ -45,50 +34,53 @@ class WinnerTree:
         """
         return self.tree[1]
 
-    def atualizar_vencedor(self, novo_valor):
+    def atualizar_vencedor(self, indice):
         """
-        Atualiza o valor do vencedor e refaz a competição.
-        :param novo_valor: Novo valor do vencedor.
+        Atualiza a árvore de vencedores após a remoção do vencedor atual.
         """
-        vencedor_atual = self.obter_vencedor()
-        self.competidores[vencedor_atual] = novo_valor
-        i = self.n + vencedor_atual
-        while i > 1:
-            i //= 2
-            self.tree[i] = self._comparar_vencedores(self.tree[2 * i], self.tree[2 * i + 1])
+        pos = (self.n + indice) // 2
+        while pos > 0:
+            esquerda = self.tree[2 * pos]
+            direita = self.tree[2 * pos + 1]
+            self.tree[pos] = self._comparar_vencedores(esquerda, direita)
+            pos //= 2
 
     def intercalar_particoes_com_winner_tree(self, particoes, arquivo_saida):
         """
-        Intercala as partições ordenadas usando a Árvore de Vencedores.
-        :param particoes: Lista de caminhos para as partições ordenadas.
+        Intercala as partições usando a árvore de vencedores e gera um arquivo final ordenado.
+        :param particoes: Lista de caminhos das partições.
         :param arquivo_saida: Caminho do arquivo de saída ordenado.
         """
         arquivos = [open(particao, 'rb') for particao in particoes]
-
         competidores = []
+
+        # Inicializar competidores com o primeiro elemento de cada partição
         for i, arquivo in enumerate(arquivos):
             try:
                 entidade = pickle.load(arquivo)
-                competidores.append((i, entidade))
+                competidores.append((i, int(entidade.id), entidade))
             except EOFError:
-                pass
+                competidores.append((i, float('inf'), None))
 
-        arvore = WinnerTree(competidores)
+        self.__init__(competidores)
 
         with open(arquivo_saida, 'wb') as saida:
             while True:
-                vencedor = arvore.obter_vencedor()
-                _, entidade_vencedora = arvore.competidores[vencedor]
-                pickle.dump(entidade_vencedora, saida)
+                vencedor_indice = self.obter_vencedor()
+                vencedor_particao, _, vencedor_entidade = self.competidores[vencedor_indice]
+
+                if vencedor_entidade is None:
+                    break
+
+                pickle.dump(vencedor_entidade, saida)
 
                 try:
-                    nova_entidade = pickle.load(arquivos[vencedor])
-                    arvore.atualizar_vencedor((vencedor, nova_entidade))
+                    nova_entidade = pickle.load(arquivos[vencedor_particao])
+                    self.competidores[vencedor_indice] = (vencedor_particao, int(nova_entidade.id), nova_entidade)
                 except EOFError:
-                    arvore.atualizar_vencedor((vencedor, float('inf')))
+                    self.competidores[vencedor_indice] = (vencedor_particao, float('inf'), None)
 
-                if all(competidor[1] == float('inf') for competidor in arvore.competidores):
-                    break
+                self.atualizar_vencedor(vencedor_indice)
 
         for arquivo in arquivos:
             arquivo.close()

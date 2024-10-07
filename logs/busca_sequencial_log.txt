@@ -12,3 +12,7 @@
 2024-08-15 19:20:26 - Busca Sequencial - Tempo de Execução: 22.182078 segundos
 2024-09-02 17:17:24 - Busca Sequencial - Tempo de Execução: 1.694745 segundos
 2024-09-16 16:32:08 - Busca Sequencial - Tempo de Execução: 2.003657 segundos
+2024-09-16 19:32:30 - Busca Sequencial - Tempo de Execução: 1.812542 segundos
+2024-09-17 19:25:00 - Busca Sequencial - Tempo de Execução: 1.934675 segundos
+2024-09-17 19:32:30 - Busca Sequencial - Tempo de Execução: 1.934351 segundos
+2024-09-19 16:53:47 - Busca Sequencial - Tempo de Execução: 1.840132 segundos

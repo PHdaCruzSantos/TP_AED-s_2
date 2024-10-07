@@ -1,134 +1,74 @@
 import heapq
 import os
 import pickle
-import re
-from funcionalidades.arvore_de_vencedores import WinnerTree
 
-def extrair_letra_numero(id_str):
+def gerar_particoes_selecao_por_substituicao(entidades, memoria_max, tipo_entidade):
     """
-    Extrai a parte alfabética e numérica de um identificador.
-    :param id_str: String no formato de 'A101'.
-    :return: Tupla com a letra e o número como inteiro.
-    """
-    match = re.match(r"([A-Za-z]+)(\d+)", id_str)
-    if match:
-        letra = match.group(1)
-        numero = int(match.group(2))
-        return letra, numero
-    raise ValueError(f"Formato de ID inválido: {id_str}")
+    Gera partições ordenadas de uma lista de entidades usando seleção por substituição.
 
-def converter_binario_para_texto(arquivo_binario, arquivo_texto, entidade_key='id'):
-    """
-    Converte um arquivo binário em formato pickle para um arquivo de texto com IDs.
-    :param arquivo_binario: Caminho do arquivo binário (.db).
-    :param arquivo_texto: Caminho para o arquivo de texto temporário.
-    :param entidade_key: Chave usada para identificar as entidades.
-    """
-    with open(arquivo_binario, 'rb') as bin_file:
-        entidades = pickle.load(bin_file)
-
-    with open(arquivo_texto, 'w', encoding='utf-8') as txt_file:
-        for entidade in entidades:
-            txt_file.write(f"{getattr(entidade, entidade_key)}\n")
-
-def converter_binario_para_texto(arquivo_binario, arquivo_temp, entidade_key):
-    """
-    Converte um arquivo binário para um arquivo de texto temporário.
-    
-    :param arquivo_binario: Caminho do arquivo binário.
-    :param arquivo_temp: Caminho do arquivo de texto temporário.
-    :param entidade_key: Chave de identificação das entidades.
-    """
-    with open(arquivo_binario, 'rb') as bin_file:
-        entidades = pickle.load(bin_file)
-    
-    with open(arquivo_temp, 'w') as txt_file:
-        for entidade in entidades:
-            txt_file.write(f"{getattr(entidade, entidade_key)}\n")
-
-def gerar_particoes_selecao_por_substituicao_binario(arquivo_entrada, memoria_max):
-    """
-    Gera partições ordenadas de um arquivo binário de entrada usando seleção por substituição.
-
-    :param arquivo_entrada: Caminho do arquivo binário de entrada desordenado.
+    :param entidades: Lista de entidades desordenadas.
     :param memoria_max: Tamanho máximo de elementos a serem carregados na memória.
+    :param tipo_entidade: Tipo da entidade (ex: 'imoveis', 'clientes', 'corretores').
     :return: Lista de arquivos de partições ordenadas.
     """
     particoes = []
     contador_particoes = 0
 
-    with open(arquivo_entrada, 'rb') as entrada:
-        heap = []
-        buffer_saida = []
-        
-        # Ler os primeiros 'memoria_max' elementos e inserir no heap
-        for _ in range(memoria_max):
-            try:
-                entidade = pickle.load(entrada)
-                heapq.heappush(heap, entidade)
-            except EOFError:
-                break
+    # Criar a pasta de partições se não existir
+    pasta_particoes = f'particoes/{tipo_entidade}'
+    if not os.path.exists(pasta_particoes):
+        os.makedirs(pasta_particoes)
 
-        while heap:
-            menor = heapq.heappop(heap)
+    heap = []
+    buffer_saida = []
+    congelados = []
+    
+    # Ler os primeiros 'memoria_max' elementos e inserir no heap
+    for i in range(min(memoria_max, len(entidades))):
+        entidade = entidades[i]
+        heapq.heappush(heap, (int(entidade.id), entidade))
+
+    index = memoria_max
+
+    while heap or congelados:
+        if heap:
+            menor = heapq.heappop(heap)[1]
             buffer_saida.append(menor)
-            
-            # Ler o próximo elemento
-            try:
-                proximo = pickle.load(entrada)
-                if proximo >= menor:
-                    heapq.heappush(heap, proximo)
-                else:
-                    # Se o próximo elemento é menor, começa a formar uma nova partição
-                    heapq.heappush(heap, proximo)
-            except EOFError:
-                break
+        else:
+            menor = None
 
-            # Quando o buffer atingir o tamanho máximo, criar uma nova partição
-            if len(buffer_saida) >= memoria_max:
-                contador_particoes += 1
-                nome_particao = f"particao_{contador_particoes}.bin"
-                particoes.append(nome_particao)
-                with open(nome_particao, 'wb') as particao:
-                    for item in buffer_saida:
-                        pickle.dump(item, particao)
-                buffer_saida = []
+        # Ler o próximo elemento
+        if index < len(entidades):
+            proximo = entidades[index]
+            index += 1
+            if menor is not None and int(proximo.id) >= int(menor.id):
+                heapq.heappush(heap, (int(proximo.id), proximo))
+            else:
+                # Se o próximo elemento é menor, congela o elemento
+                congelados.append(proximo)
 
-        # Escrever os elementos restantes
-        if buffer_saida:
+        # Quando o buffer atingir o tamanho máximo, criar uma nova partição
+        if len(buffer_saida) >= memoria_max:
             contador_particoes += 1
-            nome_particao = f"particao_{contador_particoes}.bin"
+            nome_particao = f"{pasta_particoes}/particao_{contador_particoes}.bin"
             particoes.append(nome_particao)
             with open(nome_particao, 'wb') as particao:
                 for item in buffer_saida:
                     pickle.dump(item, particao)
+            buffer_saida = []
+
+            # Descongelar elementos para a próxima partição
+            heap.extend((int(entidade.id), entidade) for entidade in congelados)
+            congelados = []
+            heapq.heapify(heap)
+
+    # Escrever os elementos restantes
+    if buffer_saida:
+        contador_particoes += 1
+        nome_particao = f"{pasta_particoes}/particao_{contador_particoes}.db"
+        particoes.append(nome_particao)
+        with open(nome_particao, 'wb') as particao:
+            for item in buffer_saida:
+                pickle.dump(item, particao)
 
     return particoes
-# def ordenar_arquivo_binario(arquivo_binario, memoria_max, entidade_key):
-#     """
-#     Ordena um arquivo binário usando seleção por substituição e intercalando as partições.
-    
-#     :param arquivo_binario: Caminho do arquivo binário a ser ordenado.
-#     :param memoria_max: Tamanho máximo de elementos a serem carregados na memória.
-#     :param entidade_key: Chave de identificação das entidades.
-#     """
-#     arquivo_temp = 'temp_ordenacao.db'
-#     arquivo_temp_ordenado = 'temp_ordenacao_ordenada.db'
-
-#     converter_binario_para_texto(arquivo_binario, arquivo_temp, entidade_key)
-
-#     particoes = gerar_particoes_selecao_por_substituicao(arquivo_temp, memoria_max)
-
-#     # Atualizar o vencedor usando a árvore de vencedores
-#     arvore = WinnerTree(particoes)
-#     arvore.intercalar_particoes_com_winner_tree(particoes, arquivo_temp_ordenado)
-
-#     with open(arquivo_binario, 'rb') as bin_file:
-#         entidades_originais = pickle.load(bin_file)
-
-#     converter_texto_para_binario(arquivo_temp_ordenado, arquivo_binario, entidades_originais, entidade_key)
-
-#     # os.remove(arquivo_temp)
-#     # os.remove(arquivo_temp_ordenado)
-#     # for particao in particoes:
-#     #     os.remove(particao)

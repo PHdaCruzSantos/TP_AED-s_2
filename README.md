@@ -9,21 +9,25 @@ Este projeto foi desenvolvido para o curso de Algoritmos e Estruturas de Dados c
 O projeto está organizado da seguinte forma:
 
 📁/imobiliaria <br>
-  |📄-- main.py <br>
+|📄-- main.py <br>
 📁 -- entidades/ <br>
-  |📄-- imovel.py <br>
-  |📄-- cliente.py <br>
-  |📄-- corretor.py <br>
+|📄-- imovel.py <br>
+|📄-- cliente.py <br>
+|📄-- corretor.py <br>
+|📄-- contrato.py <br>
 📁 -- funcionalidades/ <br>
-  |📄-- busca.py <br>
-  |📄-- ordenacao.py <br>
+|📄-- busca.py <br>
+|📄-- arvore_de_vencedores.py <br>
+|📄-- calcula_particoes.py <br>
+|📄-- selecionar_subistituicao.py <br>
+|📄-- ordenacao.py <br>
 📁 -- sistema/ <br>
-  |📄-- sistema_imobiliaria.py <br>
-  |📄-- utils.py <br>
+|📄-- sistema_imobiliaria.py <br>
+|📄-- utils.py <br>
 📁 -- logs/ <br>
-  |📄-- busca_sequencial_log.txt <br>
-  |📄-- busca_binaria_log.txt <br>
-  |📄-- ordenacao_log.txt <br>
+|📄-- busca_sequencial_log.txt <br>
+|📄-- busca_binaria_log.txt <br>
+|📄-- ordenacao_log.txt <br>
 
 ### Pastas e Arquivos
 
